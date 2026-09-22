@@ -3,7 +3,7 @@ uvicorn
 sqlalchemy
 psycopg2-binary
 pgvector
-openai
+google-genai
 python-dotenv
 pydantic
 pytest
