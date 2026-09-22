@@ -21,3 +21,13 @@ class SearchRequest(BaseModel):
     genre: str | None = None
     min_year: int | None = None
     max_year: int | None = None
+
+
+class ChatRequest(BaseModel):
+    conversation_id: int | None = None
+    message: str
+
+
+class ChatResponse(BaseModel):
+    conversation_id: int
+    reply: str

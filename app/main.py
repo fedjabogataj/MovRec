@@ -3,9 +3,10 @@ from sqlalchemy import select, text
 from sqlalchemy.orm import Session
 
 from .db import get_db
+from .llm import chat
 from .models import Movie
 from .retrieval import search_movies
-from .schemas import MovieOut, MovieSearchResult, SearchRequest
+from .schemas import ChatRequest, ChatResponse, MovieOut, MovieSearchResult, SearchRequest
 
 app = FastAPI()
 
@@ -58,3 +59,9 @@ def search(request: SearchRequest, db: Session = Depends(get_db)):
         )
         for r in results
     ]
+
+
+@app.post("/chat", response_model=ChatResponse)
+def chat_endpoint(request: ChatRequest, db: Session = Depends(get_db)):
+    conversation_id, reply = chat(db, request.conversation_id, request.message)
+    return ChatResponse(conversation_id=conversation_id, reply=reply)
