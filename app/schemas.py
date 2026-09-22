@@ -1,4 +1,4 @@
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict, Field
 
 
 class MovieOut(BaseModel):
@@ -16,8 +16,8 @@ class MovieSearchResult(MovieOut):
 
 
 class SearchRequest(BaseModel):
-    query: str
-    top_k: int = 5
+    query: str = Field(min_length=1)
+    top_k: int = Field(default=5, ge=1, le=50)
     genre: str | None = None
     min_year: int | None = None
     max_year: int | None = None
@@ -25,7 +25,7 @@ class SearchRequest(BaseModel):
 
 class ChatRequest(BaseModel):
     conversation_id: int | None = None
-    message: str
+    message: str = Field(min_length=1)
 
 
 class ChatResponse(BaseModel):

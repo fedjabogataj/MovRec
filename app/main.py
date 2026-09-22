@@ -1,5 +1,10 @@
-from fastapi import Depends, FastAPI, HTTPException
+import logging
+import time
+
+from fastapi import Depends, FastAPI, HTTPException, Request
+from google.genai import errors as genai_errors
 from sqlalchemy import select, text
+from sqlalchemy.exc import OperationalError
 from sqlalchemy.orm import Session
 
 from .db import get_db
@@ -8,11 +13,32 @@ from .models import Movie
 from .retrieval import search_movies
 from .schemas import ChatRequest, ChatResponse, MovieOut, MovieSearchResult, SearchRequest
 
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger("movrec")
+
 app = FastAPI()
+
+
+@app.middleware("http")
+async def log_requests(request: Request, call_next):
+    logger.info("request received: %s %s", request.method, request.url.path)
+    start = time.monotonic()
+    response = await call_next(request)
+    duration_ms = (time.monotonic() - start) * 1000
+    logger.info(
+        "response sent: %s %s -> %d (%.0fms)",
+        request.method, request.url.path, response.status_code, duration_ms,
+    )
+    return response
+
 
 @app.get("/health")
 def health(db: Session = Depends(get_db)):
-    db.execute(text("SELECT 1"))
+    try:
+        db.execute(text("SELECT 1"))
+    except OperationalError:
+        logger.exception("health check failed: database unreachable")
+        raise HTTPException(status_code=503, detail="Database unreachable")
     return {"status": "ok"}
 
 
@@ -63,5 +89,9 @@ def search(request: SearchRequest, db: Session = Depends(get_db)):
 
 @app.post("/chat", response_model=ChatResponse)
 def chat_endpoint(request: ChatRequest, db: Session = Depends(get_db)):
-    conversation_id, reply = chat(db, request.conversation_id, request.message)
+    try:
+        conversation_id, reply = chat(db, request.conversation_id, request.message)
+    except genai_errors.APIError:
+        logger.exception("chat failed: Gemini API error")
+        raise HTTPException(status_code=503, detail="AI service temporarily unavailable")
     return ChatResponse(conversation_id=conversation_id, reply=reply)

@@ -1,4 +1,4 @@
-import os
+import logging
 import time
 
 from dotenv import load_dotenv
@@ -7,12 +7,15 @@ from google.genai import errors, types
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
+from .db import require_env
 from .models import Conversation, Message
 from .retrieval import search_movies
 
 load_dotenv()
 
-client = genai.Client(api_key=os.environ["GEMINI_API_KEY"])
+logger = logging.getLogger("movrec")
+
+client = genai.Client(api_key=require_env("GEMINI_API_KEY"))
 
 MODEL = "gemini-flash-lite-latest"
 
@@ -50,6 +53,10 @@ def _make_search_tool(db: Session):
             min_year: Optional minimum release year (inclusive).
             max_year: Optional maximum release year (inclusive).
         """
+        logger.info(
+            "tool called: search_movies_tool(query=%r, top_k=%d, genre=%r, min_year=%r, max_year=%r)",
+            query, top_k, genre, min_year, max_year,
+        )
         results = search_movies(
             db, query, top_k=top_k,
             filters={"genre": genre, "min_year": min_year, "max_year": max_year},
