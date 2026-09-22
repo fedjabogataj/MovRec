@@ -9,3 +9,15 @@ class MovieOut(BaseModel):
     year: int | None
     genres: str
     description: str
+
+
+class MovieSearchResult(MovieOut):
+    score: float
+
+
+class SearchRequest(BaseModel):
+    query: str
+    top_k: int = 5
+    genre: str | None = None
+    min_year: int | None = None
+    max_year: int | None = None

@@ -4,7 +4,8 @@ from sqlalchemy.orm import Session
 
 from .db import get_db
 from .models import Movie
-from .schemas import MovieOut
+from .retrieval import search_movies
+from .schemas import MovieOut, MovieSearchResult, SearchRequest
 
 app = FastAPI()
 
@@ -36,3 +37,24 @@ def get_movie(movie_id: int, db: Session = Depends(get_db)):
     movie = db.get(Movie, movie_id)
     if movie is None: raise HTTPException(status_code=404, detail="Movie not found")
     return movie
+
+
+@app.post("/search", response_model=list[MovieSearchResult])
+def search(request: SearchRequest, db: Session = Depends(get_db)):
+    filters = {
+        "genre": request.genre,
+        "min_year": request.min_year,
+        "max_year": request.max_year,
+    }
+    results = search_movies(db, request.query, top_k=request.top_k, filters=filters)
+    return [
+        MovieSearchResult(
+            id=r["movie"].id,
+            title=r["movie"].title,
+            year=r["movie"].year,
+            genres=r["movie"].genres,
+            description=r["movie"].description,
+            score=r["score"],
+        )
+        for r in results
+    ]
