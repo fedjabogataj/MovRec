@@ -22,5 +22,15 @@ services:
       GEMINI_API_KEY: ${GEMINI_API_KEY}
       TMDB_API_KEY: ${TMDB_API_KEY}
 
+  stats-refresher:
+    build:
+      context: .
+      dockerfile: Dockerfile.cron
+    depends_on:
+      - db
+    environment:
+      DATABASE_URL: postgresql+psycopg2://movrec:movrec@db:5432/movrec
+    restart: unless-stopped
+
 volumes:
   pgdata:
