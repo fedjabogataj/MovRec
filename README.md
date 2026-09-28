@@ -62,7 +62,7 @@ The second turn answered correctly from conversation memory *without* triggering
 
 Every recommendation above is a real row from the seeded Postgres catalog, retrieved by the `search_movies_tool` the LLM calls — not invented by the model.
 
-## 60-second architecture explanation
+## Short architecture explanation
 
 > A user sends a message to `POST /chat`. FastAPI saves it to Postgres in a `messages` table, then loads that conversation's prior turns and hands the whole history to Gemini, along with a system prompt and one tool the model can call: `search_movies_tool`.
 >
