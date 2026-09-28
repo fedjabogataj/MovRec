@@ -1,0 +1,67 @@
+[
+  {
+    "query": "a mind-bending sci-fi movie",
+    "filters": {"genre": null, "min_year": null, "max_year": null},
+    "relevant_movie_ids": [79132, 4226, 4878, 7361, 2571]
+  },
+  {
+    "query": "a movie about space exploration",
+    "filters": {"genre": null, "min_year": null, "max_year": null},
+    "relevant_movie_ids": [150, 924, 109487, 1584, 1917]
+  },
+  {
+    "query": "a heist movie",
+    "filters": {"genre": null, "min_year": null, "max_year": null},
+    "relevant_movie_ids": [4963, 1089, 50, 6, 4011]
+  },
+  {
+    "query": "a good comedy",
+    "filters": {"genre": null, "min_year": 1990, "max_year": 1999},
+    "relevant_movie_ids": [1265, 357, 39, 539, 339]
+  },
+  {
+    "query": "a scary horror movie",
+    "filters": {"genre": null, "min_year": null, "max_year": null},
+    "relevant_movie_ids": [1258, 1214, 1219, 593, 1387]
+  },
+  {
+    "query": "a war movie",
+    "filters": {"genre": null, "min_year": null, "max_year": null},
+    "relevant_movie_ids": [2028, 1222, 1208, 110, 527]
+  },
+  {
+    "query": "a superhero movie",
+    "filters": {"genre": null, "min_year": null, "max_year": null},
+    "relevant_movie_ids": [58559, 59315, 5349, 3793, 33794]
+  },
+  {
+    "query": "a heartwarming animated family movie",
+    "filters": {"genre": null, "min_year": null, "max_year": null},
+    "relevant_movie_ids": [1, 6377, 68954, 60069, 8961]
+  },
+  {
+    "query": "an epic fantasy adventure",
+    "filters": {"genre": null, "min_year": null, "max_year": null},
+    "relevant_movie_ids": [4993, 5952, 7153, 4896, 1197]
+  },
+  {
+    "query": "a gritty crime drama",
+    "filters": {"genre": null, "min_year": null, "max_year": null},
+    "relevant_movie_ids": [1213, 858, 296, 48516, 6016]
+  },
+  {
+    "query": "a time travel movie",
+    "filters": {"genre": null, "min_year": null, "max_year": null},
+    "relevant_movie_ids": [1270, 2011, 2012, 32, 1265]
+  },
+  {
+    "query": "a spy thriller",
+    "filters": {"genre": null, "min_year": null, "max_year": null},
+    "relevant_movie_ids": [10, 49272, 5418, 648, 1610]
+  },
+  {
+    "query": "a classic movie musical",
+    "filters": {"genre": null, "min_year": null, "max_year": null},
+    "relevant_movie_ids": [1028, 595, 919, 1073, 594]
+  }
+]
