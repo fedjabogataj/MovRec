@@ -10,11 +10,17 @@ services:
     volumes:
       - pgdata:/var/lib/postgresql/data
       - ./init-db:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U movrec -d movrec"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
 
   app:
     build: .
     depends_on:
-      - db
+      db:
+        condition: service_healthy
     ports:
       - "8000:8000"
     environment:
@@ -27,7 +33,8 @@ services:
       context: .
       dockerfile: Dockerfile.cron
     depends_on:
-      - db
+      db:
+        condition: service_healthy
     environment:
       DATABASE_URL: postgresql+psycopg2://movrec:movrec@db:5432/movrec
     restart: unless-stopped
