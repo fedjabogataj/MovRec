@@ -31,3 +31,11 @@ class Message(Base):
     content: Mapped[str]
     created_at: Mapped[datetime] = mapped_column(server_default=func.now())
     conversation: Mapped["Conversation"] = relationship(back_populates="messages")
+    
+    
+class MovieRating(Base):
+    __tablename__ = "movie_ratings"
+    id: Mapped[int] = mapped_column(ForeignKey("movies.id"), primary_key=True)
+    count: Mapped[int]
+    mean: Mapped[float]
+    bayesian_avg: Mapped[float | None]

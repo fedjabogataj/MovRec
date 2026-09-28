@@ -1,0 +1,169 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>MovRec</title>
+<style>
+  :root {
+    color-scheme: dark;
+    --bg: #0f1115;
+    --panel: #171a21;
+    --border: #262b36;
+    --text: #e6e8ec;
+    --muted: #8a8f9c;
+    --accent: #6ea8fe;
+    --user-bubble: #2a3550;
+    --assistant-bubble: #1b1f29;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+  header {
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+  }
+  header h1 {
+    font-size: 16px;
+    margin: 0;
+    letter-spacing: 0.02em;
+  }
+  header span {
+    color: var(--muted);
+    font-size: 13px;
+  }
+  #chat {
+    flex: 1;
+    overflow-y: auto;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    max-width: 760px;
+    width: 100%;
+    margin: 0 auto;
+  }
+  .msg {
+    padding: 10px 14px;
+    border-radius: 12px;
+    line-height: 1.5;
+    font-size: 14px;
+    max-width: 80%;
+    white-space: pre-wrap;
+  }
+  .msg.user {
+    align-self: flex-end;
+    background: var(--user-bubble);
+  }
+  .msg.assistant {
+    align-self: flex-start;
+    background: var(--assistant-bubble);
+    border: 1px solid var(--border);
+  }
+  .msg.pending {
+    color: var(--muted);
+    font-style: italic;
+  }
+  form {
+    display: flex;
+    gap: 10px;
+    padding: 16px 20px;
+    border-top: 1px solid var(--border);
+    max-width: 760px;
+    width: 100%;
+    margin: 0 auto;
+  }
+  input {
+    flex: 1;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    color: var(--text);
+    border-radius: 8px;
+    padding: 10px 12px;
+    font-size: 14px;
+  }
+  input:focus { outline: 1px solid var(--accent); }
+  button {
+    background: var(--accent);
+    color: #0f1115;
+    border: none;
+    border-radius: 8px;
+    padding: 10px 18px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  button:disabled { opacity: 0.5; cursor: default; }
+</style>
+</head>
+<body>
+  <header>
+    <h1>MovRec</h1>
+    <span>conversational movie recommender</span>
+  </header>
+  <div id="chat"></div>
+  <form id="form">
+    <input id="input" type="text" placeholder="Ask for a recommendation…" autocomplete="off" />
+    <button id="send" type="submit">Send</button>
+  </form>
+
+  <script>
+    const chatEl = document.getElementById("chat");
+    const formEl = document.getElementById("form");
+    const inputEl = document.getElementById("input");
+    const sendEl = document.getElementById("send");
+    let conversationId = null;
+
+    function addMessage(role, text) {
+      const el = document.createElement("div");
+      el.className = `msg ${role}`;
+      el.textContent = text;
+      chatEl.appendChild(el);
+      chatEl.scrollTop = chatEl.scrollHeight;
+      return el;
+    }
+
+    formEl.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const message = inputEl.value.trim();
+      if (!message) return;
+
+      addMessage("user", message);
+      inputEl.value = "";
+      inputEl.disabled = true;
+      sendEl.disabled = true;
+      const pending = addMessage("assistant pending", "thinking…");
+
+      try {
+        const res = await fetch("/chat", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ conversation_id: conversationId, message }),
+        });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const data = await res.json();
+        conversationId = data.conversation_id;
+        pending.textContent = data.reply;
+        pending.className = "msg assistant";
+      } catch (err) {
+        pending.textContent = "Something went wrong reaching the assistant.";
+        pending.className = "msg assistant";
+      } finally {
+        inputEl.disabled = false;
+        sendEl.disabled = false;
+        inputEl.focus();
+      }
+    });
+  </script>
+</body>
+</html>

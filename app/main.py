@@ -1,7 +1,9 @@
 import logging
 import time
+from pathlib import Path
 
 from fastapi import Depends, FastAPI, HTTPException, Request
+from fastapi.responses import FileResponse
 from google.genai import errors as genai_errors
 from sqlalchemy import select, text
 from sqlalchemy.exc import OperationalError
@@ -17,6 +19,13 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("movrec")
 
 app = FastAPI()
+
+STATIC_DIR = Path(__file__).parent / "static"
+
+
+@app.get("/", include_in_schema=False)
+def index():
+    return FileResponse(STATIC_DIR / "index.html")
 
 
 @app.middleware("http")

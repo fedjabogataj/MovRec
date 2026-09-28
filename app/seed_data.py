@@ -1,6 +1,6 @@
 from .db import Base, engine, SessionLocal
 import csv
-from .models import Movie
+from .models import Movie, MovieRating
 from .embeddings import embed_texts
 
 
@@ -28,5 +28,21 @@ with SessionLocal() as session:
             genres=row["genres"],
             description=row["description"],
             embedding=embedding,
+        ))
+    session.commit()
+
+seeded_movie_ids = {int(row["movieId"]) for row in rows}
+
+movie_ratings = [
+    row for row in csv.DictReader(open("data/movie_ratings.csv"))
+    if int(row["movieId"]) in seeded_movie_ids
+]
+
+with SessionLocal() as session:
+    for movie in movie_ratings:
+        session.add(MovieRating(
+            id = int(movie['movieId']),
+            count = int(movie['count']),
+            mean = float(movie['mean']),
         ))
     session.commit()

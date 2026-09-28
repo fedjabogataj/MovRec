@@ -18,7 +18,7 @@ services:
     ports:
       - "8000:8000"
     environment:
-      DATABASE_URL: postgresql://movrec:movrec@db:5432/movrec
+      DATABASE_URL: postgresql+psycopg2://movrec:movrec@db:5432/movrec
       GEMINI_API_KEY: ${GEMINI_API_KEY}
       TMDB_API_KEY: ${TMDB_API_KEY}
 
